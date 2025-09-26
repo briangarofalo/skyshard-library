@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ unit.Name }} - Project SkyShard{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+    <h2>{{ unit.Name }}</h2>
+    <p><strong>Rarity: {{ unit.Rarity }} - {{ unit.Faction }} - {{ unit.Role }} - {{ unit.Type }}</strong></p>
+    <p><strong>Health:</strong> {{ unit.Health }}</p>
+    {% if unit.HasDamage %}<p><strong>Damage:</strong> {{ unit.Damage }}</p>{% endif %}
+    {% if unit.HasSpeed %}<p><strong>Speed:</strong> {{ unit.AttackSpeed }}s</p>{% endif %}
+    {% if unit.HasDamage %}<p><strong>Projectile Speed:</strong> {{ unit.ProjectileSpeed }}</p>{% endif %}
+    <p><strong>Size:</strong> {{ unit.length_x }} x {{ unit.length_y }}</p>
+    {% if unit.HasDamage %}<p><strong>Damage Type:</strong> {{ unit.DamageType }}</p>{% endif %}
+    <p><strong>Description:</strong> {{ unit.Info }}</p>
+
+{% endblock %}
