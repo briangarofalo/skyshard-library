@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Unit Data - Project SkyShard{% endblock %}
+{% block head %}
+    {{ super() }}
+    <link href="https://cdn.datatables.net/columncontrol/1.1.0/css/columnControl.dataTables.min.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+  <h2>Project SkyShard Unit Data</h2>
+    <table id="data" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Info</th>
+                <th>Rarity</th>
+                <th>Faction</th>
+                <th>Role</th>
+                <th>Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for unit in unit_data %}
+
+                <tr>
+                    <td><a href="units/unit_{{ unit.ID }}.html" target="_blank">{{ unit.Name }}</a></td>
+                    <td>{{ unit.Info }}</td>
+                    <td>{{ unit.Rarity }}</td>
+                    <td>{{ unit.Faction }}</td>
+                    <td>{{ unit.Role }}</td>
+                    <td>{{ unit.Type }}</td>
+                </tr>
+
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/columncontrol/1.1.0/js/dataTables.columnControl.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/columncontrol/1.1.0/js/columnControl.dataTables.js"></script>
+    <script>
+    new DataTable('#data', {
+        paging: false,
+        columnControl: ['order', ['searchList']],
+
+        columnDefs: [
+            {
+                target: 0,
+                className: 'always-visible',
+                columnControl: ['order',
+                    [
+                        'spacer',
+                        {
+                            extend: 'colVis',
+                            columns: ':not(.always-visible)'
+                        }
+                    ],
+                    'searchDropdown'
+                ],
+            },
+            {
+                target: 1,
+                columnControl: ['order', 'searchDropdown']
+            }
+        ],
+        ordering: {
+            indicators: false,
+            handler: false
+        }
+    });
+    </script>
+{% endblock %}

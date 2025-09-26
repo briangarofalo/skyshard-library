@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Project SkyShard Library{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+    <h1>Project SkyShard Library</h1>
+    <h2>Summary</h2>
+    <ul>
+        <li><a href="units_summary.html">Unit Summary</a></li>
+    </ul>
+    <h2>Individual Units</h2>
+    <ul>
+        {% for unit in unit_data %}
+
+        <li><a href="units/unit_{{ unit.ID }}.html">{{ unit.Name }}</a></li>
+
+        {% endfor %}
+    </ul>
+
+
+{% endblock %}
