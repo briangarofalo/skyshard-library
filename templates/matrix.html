@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Rarity Matrix - Project SkyShard{% endblock %}
+{% block head %}
+    {{ super() }}
+    <link href="https://cdn.datatables.net/columncontrol/1.1.0/css/columnControl.dataTables.min.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+  <h2>Project SkyShard Rarity Matrix</h2>
+    <table id="data" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Rarity</th>
+                {% for x_label in x_labels %}
+                    <th>{{ x_label }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for y_label in y_labels %}
+            {% set y_label_loop = loop %}
+
+                <tr>
+                    <td>{{ y_label }}</td>
+                    {% for cell_value in matrix_data[y_label_loop.index0] %}
+                        <td>{{ cell_value }}</td>
+                    {% endfor %}
+                </tr>
+
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/columncontrol/1.1.0/js/dataTables.columnControl.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/columncontrol/1.1.0/js/columnControl.dataTables.js"></script>
+    <script>
+    new DataTable('#data', {
+        paging: false,
+        searching: false,
+        columnDefs: [
+            {
+                target: 0,
+                "render": function (data, type, row) {
+                    return data;
+                }
+            },
+            {
+                targets: '_all',
+                "render": function (data, type, row) {
+                    if (data == '') {
+                        return data;
+                    } else {
+                        return '<ul><li>' + data.split(",").join("</li><li>") + '</li></ul>';
+                    }
+                }
+            },
+
+        ],
+    });
+    </script>
+{% endblock %}
