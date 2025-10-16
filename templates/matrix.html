@@ -1,15 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Rarity Matrix - Project SkyShard{% endblock %}
+{% block title %}Tier Matrix - Project SkyShard{% endblock %}
 {% block head %}
     {{ super() }}
     <link href="https://cdn.datatables.net/columncontrol/1.1.0/css/columnControl.dataTables.min.css" rel="stylesheet">
 {% endblock %}
 {% block content %}
-  <h2>Project SkyShard Rarity Matrix</h2>
+  <h2>Project SkyShard Tier Matrix</h2>
     <table id="data" class="table table-striped">
         <thead>
             <tr>
-                <th>Rarity</th>
+                <th>Tier</th>
                 {% for x_label in x_labels %}
                     <th>{{ x_label }}</th>
                 {% endfor %}
