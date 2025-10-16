@@ -5,7 +5,7 @@
 {% endblock %}
 {% block content %}
     <h2>{{ unit.Name }}</h2>
-    <p><strong>Rarity: {{ unit.Rarity }} - {{ unit.Faction }} - {{ unit.Role }} - {{ unit.Type }}</strong></p>
+    <p><strong>Tier: {{ unit.Rarity }} - {{ unit.Faction }} - {{ unit.Role }} - {{ unit.Type }}</strong></p>
     <p><strong>Health:</strong> {{ unit.Health }}</p>
     {% if unit.HasDamage %}<p><strong>Damage:</strong> {{ unit.Damage }}</p>{% endif %}
     {% if unit.HasSpeed %}<p><strong>Speed:</strong> {{ unit.AttackSpeed }}s</p>{% endif %}

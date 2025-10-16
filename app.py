@@ -11,7 +11,7 @@ main_data_file = 'data/main.json'
 
 index_output_file = 'docs/index.html'
 table_output_file = 'docs/units_summary.html'
-rarity_matrix_output_file = 'docs/unit_rarity_matrix.html'
+rarity_matrix_output_file = 'docs/unit_tier_matrix.html'
 units_details_directory = 'docs/units'
 
 unit_data = None
