@@ -134,7 +134,7 @@ def read_unit_data():
     if unit_data is None:
         unit_data = list()
         hint_pattern = re.compile(r"^\S+:\d+$")
-        with open(unit_data_file, 'r') as file:
+        with open(unit_data_file, 'r', encoding='utf-8') as file:
             raw_unit_data = json.load(file)
         for raw_unit in raw_unit_data:
             unit = dict()
@@ -169,7 +169,7 @@ def read_unit_data():
 def read_main_data():
     global main_data
     if main_data is None:
-        with open(main_data_file, 'r') as file:
+        with open(main_data_file, 'r', encoding='utf-8') as file:
             main_data = json.load(file)
     return main_data
 
