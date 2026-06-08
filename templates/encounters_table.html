@@ -1,33 +1,40 @@
 {% extends "base.html" %}
-{% block title %}Unit Data - SkyShard{% endblock %}
+{% block title %}Encounter Data - SkyShard{% endblock %}
 {% block head %}
     {{ super() }}
     <link href="https://cdn.datatables.net/columncontrol/1.1.0/css/columnControl.dataTables.min.css" rel="stylesheet">
 {% endblock %}
 {% block content %}
-  <h2>SkyShard Unit Data</h2>
+  <h2>SkyShard Encounter Data</h2>
     <table id="data" class="table table-striped">
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Info</th>
+                <th>Cost</th>
                 <th>Tier</th>
+                <th>Info</th>
+                <th>Quantity</th>
                 <th>Faction</th>
                 <th>Role</th>
                 <th>Type</th>
+                <th>Rarity</th>
             </tr>
         </thead>
         <tbody>
-            {% for unit in unit_data %}
-
-                <tr>
-                    <td><a href="units/unit_{{ unit.ID }}.html" target="_blank">{{ unit.Name }}</a></td>
-                    <td>{{ unit.Info }}</td>
-                    <td>{{ unit.Rarity }}</td>
-                    <td>{{ unit.Faction }}</td>
-                    <td>{{ unit.Role }}</td>
-                    <td>{{ unit.Type }}</td>
-                </tr>
+            {% for encounter in encounter_data %}
+                {% if encounter.InShop %}
+                    <tr>
+                        <td>{{ encounter.Name }}</td>
+                        <td>{{ encounter.Cost }}</td>
+                        <td>{{ encounter.TierInfo }}</td>
+                        <td>{{ encounter.Info }}</td>
+                        <td>{{ encounter.Specific }}</td>
+                        <td>{{ encounter.Faction }}</td>
+                        <td>{{ encounter.Role }}</td>
+                        <td>{{ encounter.Type }}</td>
+                        <td>{{ encounter.Rarity }}</td>
+                    </tr>
+                {% endif %}
 
             {% endfor %}
         </tbody>
