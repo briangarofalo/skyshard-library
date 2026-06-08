@@ -13,11 +13,12 @@
                 <th>Cost</th>
                 <th>Tier</th>
                 <th>Info</th>
-                <th>Quantity</th>
+                <th>Size</th>
                 <th>Faction</th>
                 <th>Role</th>
                 <th>Type</th>
                 <th>Rarity</th>
+                <th>Quantity Possible Units</th>
                 <th>Possible Units</th>
             </tr>
         </thead>
@@ -41,6 +42,7 @@
                         <td>{{ encounter.Role }}</td>
                         <td>{{ encounter.Type }}</td>
                         <td>{{ encounter.Rarity }}</td>
+                        <td>{{ possible_units | length }}</td>
                         <td>{{ possible_units|join(',') }}</td>
                     </tr>
                 {% endif %}
