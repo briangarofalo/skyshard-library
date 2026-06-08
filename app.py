@@ -90,7 +90,7 @@ def units():
 
 @app.route('/encounters')
 def encounters():
-    return render_template('encounters_table.html', encounter_data=read_encounter_data(), main=read_main_data())
+    return render_template('encounters_table.html', encounter_data=read_encounter_data(), main=read_main_data(), unit_data=read_unit_data())
 
 @app.route('/unit')
 def unit_detail_endpoint():
