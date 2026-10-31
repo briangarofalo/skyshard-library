@@ -1,67 +1,270 @@
 {% extends "base.html" %}
+
 {% block title %}Encounter Data - SkyShard{% endblock %}
+
 {% block head %}
-    {{ super() }}
-    <link href="https://cdn.datatables.net/columncontrol/1.1.0/css/columnControl.dataTables.min.css" rel="stylesheet">
+{{ super() }}
+<link href="https://cdn.datatables.net/columncontrol/1.1.0/css/columnControl.dataTables.min.css" rel="stylesheet">
+
+<style>
+    /* Compact, neutral unit badges keep long lists readable without hiding units. */
+    #data td.possible-units-cell {
+        min-width: 260px;
+        max-width: 680px;
+        white-space: normal;
+    }
+
+    .unit-badges {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .unit-badge {
+        appearance: none;
+        border: 1px solid #ced4da;
+        border-radius: 999px;
+        background: #f8f9fa;
+        color: #343a40;
+        cursor: pointer;
+        display: inline-block;
+        font: inherit;
+        font-size: 0.78rem;
+        line-height: 1.25;
+        padding: 3px 9px;
+        text-align: left;
+        transition: background-color 120ms ease, border-color 120ms ease;
+    }
+
+    .unit-badge:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .unit-badge:focus-visible,
+    .unit-dialog button:focus-visible {
+        outline: 3px solid #80bdff;
+        outline-offset: 2px;
+    }
+
+    .unit-dialog {
+        border: 1px solid #ced4da;
+        border-radius: 10px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        color: #212529;
+        max-height: min(80vh, 650px);
+        max-width: min(520px, calc(100vw - 32px));
+        padding: 0;
+        width: 520px;
+    }
+
+    .unit-dialog::backdrop {
+        background: rgba(20, 25, 30, 0.55);
+    }
+
+    .unit-dialog-content {
+        padding: 20px;
+    }
+
+    .unit-dialog-header {
+        align-items: flex-start;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 8px;
+    }
+
+    .unit-dialog-kicker {
+        color: #6c757d;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        margin: 0 0 4px;
+        text-transform: uppercase;
+    }
+
+    .unit-dialog-header h3 {
+        font-size: 1.35rem;
+        margin: 0;
+    }
+
+    .unit-dialog-close {
+        background: transparent;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        color: #495057;
+        cursor: pointer;
+        font-size: 1.25rem;
+        line-height: 1;
+        padding: 4px 9px;
+    }
+
+    .unit-dialog-category {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin: 0 0 16px;
+    }
+
+    .unit-detail-grid {
+        display: grid;
+        gap: 10px 16px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin: 0 0 16px;
+    }
+
+    .unit-detail {
+        border-top: 1px solid #e9ecef;
+        padding-top: 7px;
+    }
+
+    .unit-detail dt {
+        color: #6c757d;
+        font-size: 0.72rem;
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+
+    .unit-detail dd {
+        font-size: 0.95rem;
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .unit-dialog-description {
+        border-top: 1px solid #e9ecef;
+        padding-top: 12px;
+    }
+
+    .unit-dialog-description h4 {
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin: 0 0 5px;
+    }
+
+    .unit-dialog-description p {
+        margin: 0;
+        white-space: pre-wrap;
+    }
+
+    @media (max-width: 480px) {
+        .unit-detail-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .unit-dialog-content {
+            padding: 16px;
+        }
+    }
+</style>
 {% endblock %}
+
 {% block content %}
-  <h2>SkyShard Encounter Data</h2>
-    <table id="data" class="table table-striped">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Cost</th>
-                <th>Tier</th>
-                <th>Info</th>
-                <th>Size</th>
-                <th>Faction</th>
-                <th>Role</th>
-                <th>Type</th>
-                <th>Rarity</th>
-                <th>Quantity Possible Units</th>
-                <th>Possible Units</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for encounter in encounter_data %}
-                {% if encounter.InShop %}
-                    {%- set possible_units = [] -%}
-                    {%- for unit in unit_data -%}
-                        {% if unit.InShop and (encounter.Faction == "None" or encounter.Faction == unit.Faction) and (encounter.Role == "None" or encounter.Role == unit.Role) and (encounter.Type == "None" or encounter.Type == unit.Type) and (unit.Rarity | string in encounter.TierInfo)  %}
-                            {%- set _ = possible_units.append(unit.Name) -%}
-                        {% endif %}
-                    {%- endfor -%}
+<h2>SkyShard Encounter Data</h2>
 
-                    <tr>
-                        <td>{{ encounter.Name }}</td>
-                        <td>{{ encounter.Cost }}</td>
-                        <td>{{ encounter.TierInfo }}</td>
-                        <td>{{ encounter.Info }}</td>
-                        <td>{{ encounter.Specific }}</td>
-                        <td>{{ encounter.Faction }}</td>
-                        <td>{{ encounter.Role }}</td>
-                        <td>{{ encounter.Type }}</td>
-                        <td>{{ encounter.Rarity }}</td>
-                        <td>{{ possible_units | length }}</td>
-                        <td>{{ possible_units|join(',') }}</td>
-                    </tr>
-                {% endif %}
+<table id="data" class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Cost</th>
+            <th>Tier</th>
+            <th>Info</th>
+            <th>Size</th>
+            <th>Faction</th>
+            <th>Role</th>
+            <th>Type</th>
+            <th>Rarity</th>
+            <th>Quantity Possible Units</th>
+            <th>Possible Units</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for encounter in encounter_data %}
+            {% if encounter.InShop %}
+                {%- set possible_units = [] -%}
+                {%- for unit in unit_data -%}
+                    {% if unit.InShop and (encounter.Faction == "None" or encounter.Faction == unit.Faction) and (encounter.Role == "None" or encounter.Role == unit.Role) and (encounter.Type == "None" or encounter.Type == unit.Type) and (unit.Rarity | string in encounter.TierInfo) %}
+                        {%- set _ = possible_units.append(unit) -%}
+                    {% endif %}
+                {%- endfor -%}
+                <tr>
+                    <td>{{ encounter.Name }}</td>
+                    <td>{{ encounter.Cost }}</td>
+                    <td>{{ encounter.TierInfo }}</td>
+                    <td>{{ encounter.Info }}</td>
+                    <td>{{ encounter.Specific }}</td>
+                    <td>{{ encounter.Faction }}</td>
+                    <td>{{ encounter.Role }}</td>
+                    <td>{{ encounter.Type }}</td>
+                    <td>{{ encounter.Rarity }}</td>
+                    <td>{{ possible_units | length }}</td>
+                    <td class="possible-units-cell">
+                        <div class="unit-badges">
+                            {% for unit in possible_units %}
+                                <button
+                                    type="button"
+                                    class="unit-badge"
+                                    data-unit-name="{{ unit.Name }}"
+                                    data-rarity="{{ unit.Rarity }}"
+                                    data-faction="{{ unit.Faction }}"
+                                    data-role="{{ unit.Role }}"
+                                    data-type="{{ unit.Type }}"
+                                    data-health="{{ unit.Health }}"
+                                    data-has-damage="{{ 'true' if unit.HasDamage else 'false' }}"
+                                    data-damage="{{ unit.Damage }}"
+                                    data-has-speed="{{ 'true' if unit.HasSpeed else 'false' }}"
+                                    data-attack-speed="{{ unit.AttackSpeed }}"
+                                    data-projectile-speed="{{ unit.ProjectileSpeed }}"
+                                    data-size="{{ unit.length_x }} x {{ unit.length_y }}"
+                                    data-damage-type="{{ unit.DamageType }}"
+                                    data-info="{{ unit.Info }}"
+                                    aria-haspopup="dialog"
+                                    aria-label="View details for {{ unit.Name }}">
+                                    {{ unit.Name }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
 
-            {% endfor %}
-        </tbody>
+<dialog id="unit-details-dialog" class="unit-dialog" aria-labelledby="unit-dialog-name">
+    <div class="unit-dialog-content">
+        <div class="unit-dialog-header">
+            <div>
+                <p class="unit-dialog-kicker">Unit details</p>
+                <h3 id="unit-dialog-name"></h3>
+            </div>
+            <button type="button" class="unit-dialog-close" id="unit-dialog-close" aria-label="Close unit details">&times;</button>
+        </div>
+        <p class="unit-dialog-category" id="unit-dialog-category"></p>
+        <dl class="unit-detail-grid">
+            <div class="unit-detail"><dt>Health</dt><dd id="unit-health"></dd></div>
+            <div class="unit-detail" id="unit-damage-row" hidden><dt>Damage</dt><dd id="unit-damage"></dd></div>
+            <div class="unit-detail" id="unit-speed-row" hidden><dt>Attack speed</dt><dd id="unit-attack-speed"></dd></div>
+            <div class="unit-detail" id="unit-projectile-row" hidden><dt>Projectile speed</dt><dd id="unit-projectile-speed"></dd></div>
+            <div class="unit-detail"><dt>Size</dt><dd id="unit-size"></dd></div>
+            <div class="unit-detail" id="unit-damage-type-row" hidden><dt>Damage type</dt><dd id="unit-damage-type"></dd></div>
+        </dl>
+        <div class="unit-dialog-description" id="unit-description-row">
+            <h4>Description</h4>
+            <p id="unit-info"></p>
+        </div>
+    </div>
+</dialog>
 
-    </table>
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/columncontrol/1.1.0/js/dataTables.columnControl.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/columncontrol/1.1.0/js/columnControl.dataTables.js"></script>
 
-
-    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/columncontrol/1.1.0/js/dataTables.columnControl.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/columncontrol/1.1.0/js/columnControl.dataTables.js"></script>
-    <script>
+<script>
     new DataTable('#data', {
         paging: false,
         columnControl: ['order', ['searchList']],
-
         columnDefs: [
             {
                 target: 0,
@@ -87,5 +290,69 @@
             handler: false
         }
     });
-    </script>
+
+    (() => {
+        const dialog = document.getElementById('unit-details-dialog');
+        const closeButton = document.getElementById('unit-dialog-close');
+
+        if (!dialog || typeof dialog.showModal !== 'function') {
+            // Keep the unit names usable as labels in browsers without dialog support.
+            return;
+        }
+
+        const setText = (id, value) => {
+            document.getElementById(id).textContent = value || '—';
+        };
+
+        const setRow = (rowId, valueId, value, shouldShow = true) => {
+            const row = document.getElementById(rowId);
+            row.hidden = !shouldShow || !value;
+            if (valueId) {
+                setText(valueId, value);
+            }
+        };
+
+        document.querySelector('#data').addEventListener('click', event => {
+            const badge = event.target.closest('.unit-badge');
+            if (!badge) return;
+
+            const unit = badge.dataset;
+            setText('unit-dialog-name', unit.unitName);
+            setText(
+                'unit-dialog-category',
+                `Tier ${unit.rarity} · ${unit.faction} · ${unit.role} · ${unit.type}`
+            );
+            setText('unit-health', unit.health);
+            setText('unit-size', unit.size);
+            setRow('unit-damage-row', 'unit-damage', unit.damage, unit.hasDamage === 'true');
+            setRow('unit-speed-row', 'unit-attack-speed', unit.attackSpeed, unit.hasSpeed === 'true');
+            setRow(
+                'unit-projectile-row',
+                'unit-projectile-speed',
+                unit.projectileSpeed,
+                unit.hasDamage === 'true'
+            );
+            setRow(
+                'unit-damage-type-row',
+                'unit-damage-type',
+                unit.damageType,
+                unit.hasDamage === 'true'
+            );
+
+            const description = unit.info || '';
+            document.getElementById('unit-description-row').hidden = !description;
+            setText('unit-info', description);
+
+            dialog.showModal();
+        });
+
+        closeButton.addEventListener('click', () => dialog.close());
+
+        dialog.addEventListener('click', event => {
+            if (event.target === dialog) {
+                dialog.close();
+            }
+        });
+    })();
+</script>
 {% endblock %}
