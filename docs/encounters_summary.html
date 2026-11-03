@@ -10,6 +10,31 @@
 <link href="https://cdn.datatables.net/columncontrol/1.1.0/css/columnControl.dataTables.min.css" rel="stylesheet">
 
 <style>
+    .possible-units-search {
+        margin: 0 0 1rem;
+        max-width: 560px;
+    }
+
+    .possible-units-search label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.35rem;
+    }
+
+    .possible-units-search-controls {
+        display: flex;
+        gap: 8px;
+    }
+
+    .possible-units-search-controls input {
+        min-width: 0;
+    }
+
+    #possible-units-search-status:not(:empty) {
+        display: block;
+        margin-top: 4px;
+    }
+
     /* Compact, neutral unit badges keep long lists readable without hiding units. */
     #data td.possible-units-cell {
         min-width: 260px;
@@ -165,6 +190,20 @@
 <body>
     <div id="content">
 <h2>SkyShard Encounter Data</h2>
+
+<div class="possible-units-search" role="search" aria-label="Search possible units">
+    <label for="possible-units-search-input">Find encounters by possible unit</label>
+    <div class="possible-units-search-controls">
+        <input type="search" id="possible-units-search-input" class="form-control"
+               placeholder="Enter a unit name (e.g. Ruby or Ruby, Velmir)"
+               autocomplete="off" aria-describedby="possible-units-search-help">
+        <button type="button" id="possible-units-search-clear" class="btn btn-outline-secondary">Clear</button>
+    </div>
+    <small id="possible-units-search-help" class="form-text text-muted">
+        Partial names work. Separate multiple names with commas to find encounters containing any of them.
+    </small>
+    <small id="possible-units-search-status" class="form-text text-muted" aria-live="polite"></small>
+</div>
 
 <table id="data" class="table table-striped">
     <thead>
@@ -24776,7 +24815,7 @@ When Destroyed: Summon 2 Trees on empty spaces."
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/columncontrol/1.1.0/js/columnControl.dataTables.js"></script>
 
 <script>
-    new DataTable('#data', {
+    const encounterTable = new DataTable('#data', {
         paging: false,
         columnControl: ['order', ['searchList']],
         columnDefs: [
@@ -24797,6 +24836,10 @@ When Destroyed: Summon 2 Trees on empty spaces."
             {
                 target: 1,
                 columnControl: ['order', 'searchDropdown']
+            },
+            {
+                target: 10,
+                columnControl: ['order']
             }
         ],
         ordering: {
@@ -24804,6 +24847,60 @@ When Destroyed: Summon 2 Trees on empty spaces."
             handler: false
         }
     });
+
+    // Search the actual badge names in the Possible Units column.
+    // This function-based column search composes with DataTables' other filters.
+    (() => {
+        const searchInput = document.getElementById('possible-units-search-input');
+        const clearButton = document.getElementById('possible-units-search-clear');
+        const status = document.getElementById('possible-units-search-status');
+
+        if (!searchInput || !clearButton || !status) return;
+
+        const unitColumn = encounterTable.column(10);
+
+        unitColumn.search((searchValue, rowData, rowIndex) => {
+            const terms = String(searchInput.value || '')
+                .split(',')
+                .map(term => term.trim().toLocaleLowerCase())
+                .filter(Boolean);
+
+            if (terms.length === 0) return true;
+
+            const cell = encounterTable.cell(rowIndex, 10).node();
+            if (!cell) return false;
+
+            const unitNames = Array.from(cell.querySelectorAll('.unit-badge'))
+                .map(badge => (badge.dataset.unitName || badge.textContent).trim().toLocaleLowerCase());
+
+            // OR behavior: an encounter matches if it contains at least one searched unit.
+            return terms.some(term => unitNames.some(name => name.includes(term)));
+        });
+
+        const updateStatus = () => {
+            const terms = searchInput.value.split(',').map(term => term.trim()).filter(Boolean);
+            const matchingRows = encounterTable.rows({ search: 'applied' }).count();
+
+            status.textContent = terms.length
+                ? `${matchingRows} matching encounter${matchingRows === 1 ? '' : 's'}`
+                : '';
+            clearButton.disabled = searchInput.value.length === 0;
+        };
+
+        searchInput.addEventListener('input', () => {
+            encounterTable.draw();
+            updateStatus();
+        });
+
+        clearButton.addEventListener('click', () => {
+            searchInput.value = '';
+            encounterTable.draw();
+            updateStatus();
+            searchInput.focus();
+        });
+
+        updateStatus();
+    })();
 
     (() => {
         const dialog = document.getElementById('unit-details-dialog');
