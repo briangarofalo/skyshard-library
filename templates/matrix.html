@@ -3,6 +3,35 @@
 {% block head %}
     {{ super() }}
     <link href="https://cdn.datatables.net/columncontrol/1.1.0/css/columnControl.dataTables.min.css" rel="stylesheet">
+
+    <style>
+        /* Compact, neutral pills for entries in each tier-matrix cell. */
+        #data td .tier-matrix-pills {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.3rem;
+            margin: 0;
+            padding: 0.15rem 0;
+        }
+        #data td .tier-matrix-pill {
+            display: inline-block;
+            max-width: 100%;
+            padding: 0.18rem 0.55rem;
+            border: 1px solid #d7dce2;
+            border-radius: 999px;
+            background: #f3f5f7;
+            color: #343a40;
+            font-size: 0.82rem;
+            line-height: 1.35;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+        #data td:first-child {
+            white-space: nowrap;
+            font-weight: 600;
+        }
+    </style>
 {% endblock %}
 {% block content %}
   <h2>SkyShard Tier Matrix</h2>
@@ -49,12 +78,38 @@
             },
             {
                 targets: '_all',
-                "render": function (data, type, row) {
-                    if (data == '') {
+                render: function (data, type, row) {
+                    if (data === null || data === undefined || data === '') {
                         return data;
-                    } else {
-                        return '<ul><li>' + data.split(",").join("</li><li>") + '</li></ul>';
                     }
+
+                    // Preserve the raw value for sorting and other DataTables operations.
+                    if (type !== 'display') {
+                        return data;
+                    }
+
+                    // Escape source text before inserting it as HTML.
+                    const escapeHtml = function (value) {
+                        return String(value).replace(/[&<>"']/g, function (character) {
+                            return {
+                                '&': '&amp;',
+                                '<': '&lt;',
+                                '>': '&gt;',
+                                '"': '&quot;',
+                                "'": '&#39;'
+                            }[character];
+                        });
+                    };
+
+                    const pills = String(data)
+                        .split(',')
+                        .map(function (item) { return item.trim(); })
+                        .filter(function (item) { return item.length > 0; })
+                        .map(function (item) {
+                            return '<span class="tier-matrix-pill">' + escapeHtml(item) + '</span>';
+                        });
+
+                    return '<div class="tier-matrix-pills">' + pills.join('') + '</div>';
                 }
             },
 
